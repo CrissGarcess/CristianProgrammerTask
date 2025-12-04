@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     #region Dependencies
     private InputSystem_Actions _inputs;
     private CharacterController _controller;
+    [SerializeField] private Transform _cameraTransform;
     #endregion
 
     private Vector2 _moveInput;
@@ -19,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] public float forwardSpeed = 4.5f;
     [SerializeField] public float backwardSpeed = 2f;
     [SerializeField] public float strafeSpeed = 3.5f;
+    [SerializeField] public float rotationSpeed = 3.5f;
 
     public event Action<Vector2> OnMoveInputChanged;
 
@@ -56,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     void Update()
     {
-        CalculateAndApplyMovement();
+        CalculateMovement();
     }
 
     /// <summary>
@@ -71,24 +73,55 @@ public class PlayerMovement : MonoBehaviour
     /// <summary>
     /// Callback invoked when the Move action is canceled (input released).
     /// </summary>
-    /// <param name="context">Context containing input data.</param>
+    /// <param name="context">Context containing the cancellation state.</param>
     private void OnMoveCanceled(InputAction.CallbackContext context)
     {
         _moveInput = Vector2.zero;
     }
 
     /// <summary>
-    /// Determines the speed based on direction and moves the CharacterController.
+    /// Determines the appropriate speed based on direction and camera-relative movement.
     /// </summary>
-    private void CalculateAndApplyMovement()
+    private void CalculateMovement()
     {
-        float targetSpeedZ = (_moveInput.y >= 0) ? forwardSpeed : backwardSpeed;
+        float targetSpeedY = (_moveInput.y >= 0) ? forwardSpeed : backwardSpeed;
         float targetSpeedX = strafeSpeed;
 
-        var movementVector = new Vector3(_moveInput.x * targetSpeedX, 0f, _moveInput.y * targetSpeedZ);
+        // Camera-relative directions
+        Vector3 camForward = _cameraTransform.forward;
+        Vector3 camRight = _cameraTransform.right;
+        camForward.y = 0f;
+        camRight.y = 0f;
+        camForward.Normalize();
+        camRight.Normalize();
 
-        _controller.Move(movementVector * Time.deltaTime);
+        Vector3 movement = (camForward * _moveInput.y * targetSpeedY) + (camRight * _moveInput.x * targetSpeedX);
 
+        ApplyMovement(movement);
+        ApplyRotation(camForward);
+    }
+
+    /// <summary>
+    /// Applies translation to the CharacterController.
+    /// </summary>
+    /// <param name="movement">World-space movement vector.</param>
+    private void ApplyMovement(Vector3 movement)
+    {
+        _controller.Move(movement * Time.deltaTime);
         OnMoveInputChanged?.Invoke(_moveInput);
+    }
+
+    /// <summary>
+    /// Applies rotation depending on the camera's forward direction.
+    /// </summary>
+    /// <param name="camForward">Flattened camera forward vector.</param>
+    private void ApplyRotation(Vector3 camForward)
+    {
+        camForward.y = 0f;
+        if (camForward.sqrMagnitude > 0.0001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(camForward.normalized, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
     }
 }
