@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     #region Dependencies
-    private InputSystem_Actions _inputs;
+    private PlayerInputReader _playerInputReader;
     private CharacterController _controller;
     [SerializeField] private Transform _cameraTransform;
     #endregion
@@ -30,7 +30,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         _controller = GetComponent<CharacterController>();
-        _inputs = new InputSystem_Actions();
+        _playerInputReader = GetComponent<PlayerInputReader>();
     }
 
     /// <summary>
@@ -38,9 +38,7 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     void OnEnable()
     {
-        _inputs.Player.Enable();
-        _inputs.Player.Move.performed += OnMove;
-        _inputs.Player.Move.canceled += OnMoveCanceled;
+        _playerInputReader.OnMoveInputChanged += OnMove;
     }
 
     /// <summary>
@@ -48,9 +46,7 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     void OnDisable()
     {
-        _inputs.Player.Move.performed -= OnMove;
-        _inputs.Player.Move.canceled -= OnMoveCanceled;
-        _inputs.Player.Disable();
+        _playerInputReader.OnMoveInputChanged -= OnMove;
     }
 
     /// <summary>
@@ -65,18 +61,9 @@ public class PlayerMovement : MonoBehaviour
     /// Callback invoked when the Move action is performed.
     /// </summary>
     /// <param name="context">Context containing input data.</param>
-    private void OnMove(InputAction.CallbackContext context)
+    private void OnMove(Vector2 moveValue)
     {
-        _moveInput = context.ReadValue<Vector2>();
-    }
-
-    /// <summary>
-    /// Callback invoked when the Move action is canceled (input released).
-    /// </summary>
-    /// <param name="context">Context containing the cancellation state.</param>
-    private void OnMoveCanceled(InputAction.CallbackContext context)
-    {
-        _moveInput = Vector2.zero;
+        _moveInput = moveValue;
     }
 
     /// <summary>

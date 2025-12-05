@@ -12,11 +12,13 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     public Vector2 LookInput { get; private set; }
 
     // Action Events
+    public event Action<Vector2> OnMoveInputChanged;
     public event Action OnJumpPerformed;
     public event Action OnAttackPerformed;
     public event Action OnInteractPerformed;
     public event Action OnPreviousPerformed;
     public event Action OnNextPerformed;
+    public event Action OnInventoryPerformed;
 
     // State Action Events
     public event Action OnSprintStarted;
@@ -57,6 +59,7 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     public void OnMove(InputAction.CallbackContext context)
     {
         MoveInput = context.ReadValue<Vector2>();
+        OnMoveInputChanged?.Invoke(MoveInput);
     }
 
     /// <summary>
@@ -136,6 +139,12 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         else if (context.canceled)
             OnCrouchCanceled?.Invoke();
     }
+
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+        if (context.performed) OnInventoryPerformed?.Invoke();
+    }
+    
 
     #endregion
 }
