@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c13484b8dce4b0b4abd1648b6729b44b, type: 3}
-  m_Name: ItemSO_Cube
+  m_Name: ItemSO_Hair7
   m_EditorClassIdentifier: Assembly-CSharp::Item
-  ID: Cube
-  Description: This is a Cube
-  Icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-  Prefab: {fileID: 1554759151515803147, guid: fa68fd8fb19399148a1682fcf124b3e0, type: 3}
+  ID: Punk Red Hair
+  Description: A radical style never hurts.
+  Icon: {fileID: 21300000, guid: df0b18952bad5124a9927a29f8274ea4, type: 3}
+  Prefab: {fileID: 3564758606063770652, guid: 814c8945637f6904ea334590d5b02171, type: 3}
