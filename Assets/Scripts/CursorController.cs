@@ -24,7 +24,7 @@ public class CursorController : MonoBehaviour
     /// </summary>
     /// <param name="isLocked">If true, cursor is locked to center and hidden. 
     /// If false, it is free and visible.</param>
-    private void SetCursorState(bool isLocked)
+    public void SetCursorState(bool isLocked)
     {
         if (isLocked)
         {
