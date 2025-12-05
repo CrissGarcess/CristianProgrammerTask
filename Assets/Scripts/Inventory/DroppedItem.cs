@@ -15,15 +15,23 @@ public class DroppedItem : MonoBehaviour
     public Item Item;
     public bool PickedUp = false;
 
+    private Collider _collider;
+
+    private void Awake()
+    {
+        _collider = GetComponent<Collider>();
+
+        if (_collider != null)
+            _collider.enabled = false;
+    }
+
     /// <summary>
     /// Check whether the item should be initialized at the start of the game and, if so, proceed to initialize it. 
     /// </summary>
     private void Start()
     {
         if (autoStart && Item != null)
-        {
             Initialize(Item);
-        }
     }
 
     /// <summary>
@@ -35,8 +43,21 @@ public class DroppedItem : MonoBehaviour
     {
         Item = item;
 
-        GameObject droppedItem = Instantiate(item.Prefab, transform);
-        droppedItem.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        if (Item == null)
+            return;
+
+        if (Item.Prefab != null)
+        {
+            GameObject droppedItem = Instantiate(Item.Prefab, transform);
+            Vector3 localOffset = new Vector3(0, 0.5f, 0);
+            droppedItem.transform.SetLocalPositionAndRotation(localOffset, Quaternion.identity);
+        }
+
+        if (_collider == null)
+            _collider = GetComponent<Collider>();
+
+        if (_collider != null)
+            _collider.enabled = false;
 
         StartCoroutine(EnablePickup(_pickupDelay));
     }
@@ -48,6 +69,12 @@ public class DroppedItem : MonoBehaviour
     private IEnumerator EnablePickup(float delay)
     {
         yield return new WaitForSeconds(delay);
-        GetComponent<Collider>().enabled = true;
+        if (_collider == null)
+            _collider = GetComponent<Collider>();
+
+        if (_collider != null)
+        {
+            _collider.enabled = true;
+        }
     }
 }

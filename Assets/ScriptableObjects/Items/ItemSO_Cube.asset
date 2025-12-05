@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Item
   ID: Cube
   Description: This is a Cube
-  Icon: {fileID: 0}
+  Icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   Prefab: {fileID: 1554759151515803147, guid: fa68fd8fb19399148a1682fcf124b3e0, type: 3}
