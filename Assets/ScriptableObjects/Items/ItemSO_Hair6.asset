@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c13484b8dce4b0b4abd1648b6729b44b, type: 3}
+  m_Name: ItemSO_Hair6
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  ID: Blonde Long Hair
+  Description: As shiny as silk
+  Icon: {fileID: 21300000, guid: a18f5a6519878f24d95fddead1be3170, type: 3}
+  Prefab: {fileID: 7438274213043303127, guid: f1e054d52d5b68346bc2f2e4654b967f, type: 3}

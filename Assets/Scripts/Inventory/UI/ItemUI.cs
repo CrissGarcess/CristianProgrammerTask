@@ -30,11 +30,14 @@ public class ItemUI : MonoBehaviour,
     private string _inventoryID;
     private string _itemName;
     private string _itemDesc;
-    private Action<string> _removeItemAction;
+    private Item _equipableItem;
     private InventoryUI _inventoryUI;
     private Canvas _canvas;
     private RectTransform _rectTransform;
     private GameObject _dragVisual;
+
+    private Action<string> _removeItemAction;
+    public static event Action<Item> OnItemFocusChanged;
 
     /// <summary>
     /// Initialize essential component references needed for UI positioning and drag/drop functionality.
@@ -48,7 +51,6 @@ public class ItemUI : MonoBehaviour,
     /// <summary>
     /// Cleanup operations related to drag and drop.
     /// </summary>
-
     private void OnDisable()
     {
         DestroyAllOwnerVisuals();
@@ -85,6 +87,7 @@ public class ItemUI : MonoBehaviour,
     {
         _inventoryID = inventoryID;
         _removeItemAction = removeItemAction;
+        _equipableItem = item;
 
         if (_image != null)
         {
@@ -137,7 +140,11 @@ public class ItemUI : MonoBehaviour,
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!IsEmpty)
+        {
             OnItemSlotSelected?.Invoke(_itemName, _itemDesc);
+            OnItemFocusChanged?.Invoke(_equipableItem);
+        }
+            
     }
 
     /// <summary>
@@ -147,6 +154,7 @@ public class ItemUI : MonoBehaviour,
     public void OnPointerExit(PointerEventData eventData)
     {
         OnItemSlotSelected?.Invoke(null, null);
+        OnItemFocusChanged?.Invoke(null);
     }
 
     /// <summary>
@@ -229,7 +237,7 @@ public class ItemUI : MonoBehaviour,
 
     /// <summary>
     /// Handles mouse clicks on the slot. 
-    /// If the right mouse button is clicked and the slot is not empty, it triggers the removal action.
+    /// If the mouse buttons are clicked and the slot is not empty, it triggers the removal adn equip actions.
     /// </summary>
     public void OnPointerClick(PointerEventData eventData)
     {
