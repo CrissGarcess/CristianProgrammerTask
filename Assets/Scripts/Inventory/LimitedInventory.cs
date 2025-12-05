@@ -11,7 +11,11 @@ public class LimitedInventory : Inventory
 
     [Header("Slots")]
     [SerializeField] protected List<string> _inventorySlots = new();
+    [SerializeField] private DataReadWrite _dataReadWrite;
 
+    /// <summary>
+    /// Ensures the inventory slots list is initialized to the defined maximum capacity.
+    /// </summary>
     private void Start()
     {
         InitializeInventory(MAX_CAPACITY);
@@ -19,6 +23,7 @@ public class LimitedInventory : Inventory
 
     /// <summary>
     /// Attempts to add a new item to the inventory. 
+    /// Triggers inventory save if the operation was successful.
     /// </summary>
     /// <param name="item">The Item to be added.</param>
     /// <returns>True if the item was successfully added; otherwise, false if the inventory is full.</returns>
@@ -42,6 +47,37 @@ public class LimitedInventory : Inventory
         {
             _inventoryUI.AddUIItem(emptySlotIndex, inventoryID, item);
         }
+        SaveInventoryData();
+        return true;
+    }
+
+    /// <summary>
+    /// Adds a specific Item to the inventory at a predefined slot index.
+    /// </summary>
+    /// <param name="item">The Item Scriptable Object to be placed.</param>
+    /// <param name="slotIndex">The target index where the item must be placed.</param>
+    /// <returns>True if the item was successfully placed; false if the slot index is invalid or already occupied.</returns>
+    public bool AddItemAtSlot(Item item, int slotIndex)
+    {
+        InitializeInventory(MAX_CAPACITY);
+
+        if (item == null) 
+            return false;
+        
+        if (slotIndex < 0 || slotIndex >= _inventorySlots.Count)
+        {
+            return false;
+        }
+            
+        string inventoryID = Guid.NewGuid().ToString();
+
+        _inventory.Add(inventoryID, item);
+        _inventorySlots[slotIndex] = inventoryID;
+
+        if (_inventoryUI != null)
+        {
+            _inventoryUI.AddUIItem(slotIndex, inventoryID, item);
+        }
 
         return true;
     }
@@ -49,6 +85,7 @@ public class LimitedInventory : Inventory
     /// <summary>
     /// Removes an item from the inventory and spawns its corresponding DroppedItem prefab
     /// in the game world.
+    /// Triggers inventory save if the operation was successful.
     /// </summary>
     /// <param name="itemInventoryID">The Inventory ID of the item to drop.</param>
     public override void DropItem(string itemInventoryID)
@@ -66,6 +103,16 @@ public class LimitedInventory : Inventory
         _inventory.Remove(itemInventoryID);
         _inventorySlots[slotIndex] = null;
         _inventoryUI?.RemoveUIItem(slotIndex);
+
+        SaveInventoryData();
+    }
+
+    /// <summary>
+    /// Triggers a final save of the inventory state hen the application is about to quit.
+    /// </summary>
+    private void OnApplicationQuit()
+    {
+        SaveInventoryData();
     }
 
     /// <summary>
@@ -131,6 +178,7 @@ public class LimitedInventory : Inventory
 
     /// <summary>
     /// Swaps the item IDs between two inventory slots.
+    /// Triggers inventory save if the operation was successful.
     /// </summary>
     /// <param name="sourceIndex">The index of the item being moved.</param>
     /// <param name="targetIndex">The index of the slot receiving the item (can be empty or occupied).</param>
@@ -150,6 +198,29 @@ public class LimitedInventory : Inventory
         _inventorySlots[targetIndex] = sourceID;
 
         _inventoryUI?.SwapUIItems(sourceIndex, targetIndex);
+        SaveInventoryData();
         return true;
+    }
+
+    /// <summary>
+    /// Constructs the Item ID and Slot Index into a dictionary from the current inventory state 
+    /// and delegates the data serialization to the DataReadWrite component.
+    /// </summary>
+    public void SaveInventoryData()
+    {
+        Dictionary<string, int> slotMapToSave = new Dictionary<string, int>();
+        for (int i = 0; i < _inventorySlots.Count; i++)
+        {
+            string inventoryID = _inventorySlots[i];
+            if (!string.IsNullOrEmpty(inventoryID) && _inventory.ContainsKey(inventoryID))
+            {
+                Item itemSO = _inventory[inventoryID];
+
+                slotMapToSave.Add(itemSO.ID, i);
+            }
+        }
+
+        if (_dataReadWrite != null)
+            _dataReadWrite.SaveData(slotMapToSave);
     }
 }
