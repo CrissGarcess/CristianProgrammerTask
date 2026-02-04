@@ -1,5 +1,10 @@
-# CristianProgrammerTask
-This is the repository for the Unity Programmer Task for New Game +. (Cristian S. Garcés)
+# Summary:
+This is a repository for a Unity project created in 48 hours to measure code quality and efficiency by implementing:
+- Character movement (Unity Input System)
+- Blend tree
+- Inventory system
+- Save/Load system
+- Inventory UI interaction (select items, discard items, change position)
 
 # Branch Guide:
 
